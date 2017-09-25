@@ -38,6 +38,24 @@ var location_info = {
         "Saturday" : "Closed",
         "Sunday" : "Closed",
     },
+    "hop" : {
+        "Monday" :  "11:00am-midnight",
+        "Tuesday" : "11:00am-midnight",
+        "Wednesday" : "11:00am-midnight",
+        "Thursday"  : "11:00am-midnight",
+        "Friday" : "11:00am-midnight",
+        "Saturday" : "10:30am-midnight",
+        "Sunday" : "10:30am-midnight",
+    },
+    "late night" : {
+        "Monday" :  "9:30pm-1:30am",
+        "Tuesday" : "9:30pm-1:30am",
+        "Wednesday" : "9:30pm-1:30am",
+        "Thursday"  : "9:30pm-1:30am",
+        "Friday" : "9:30pm-2:00am",
+        "Saturday" : "9:30pm-2:00am",
+        "Sunday" : "9:30pm-2:00am",
+    },
 }
 
 
@@ -106,6 +124,9 @@ function getHoursForLocation(intent, session, callback){
     let speechOutput = 'Sorry you failed.';
     if(intent.slots.location.value === "foco"){
       speechOutput = "The hours for foco are 4-6pm."
+    }
+    if(location_info[intent.slots.location.value] === null){
+        speechOutput = "I'm sorry, I did not recognize that location."
     }
     speechOutput = intent.slots.location.value + " is open from " + location_info[intent.slots.location.value]["Monday"] + " today.";
     callback(sessionAttributes,
