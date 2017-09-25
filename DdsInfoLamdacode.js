@@ -10,15 +10,17 @@
  */
 // --------------- Dictionary for information-----------------------
 
+var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
 var location_info = {
     "foco" : {
-        "Monday" :  "7:30am-10:30am",
-        "Tuesday" : "7:30am-10:30am",
-        "Wednesday" : "7:30am-10:30am",
-        "Thursday"  : "7:30am-10:30am",
-        "Friday" : "7:30am-10:30am",
-        "Saturday" : "8am-10:30am",
-        "Sunday" : "8:00am-2:30pm",
+        "Monday" :  {"7:30am-10:30am", "11:00am-3pm", "5pm-8:30pm"},
+        "Tuesday" : {"7:30am-10:30am", "11:00am-3pm", "5pm-8:30pm"},
+        "Wednesday" {"7:30am-10:30am", "11:00am-3pm", "5pm-8:30pm"},
+        "Thursday"  {"7:30am-10:30am", "11:00am-3pm", "5pm-8:30pm"},
+        "Friday" : {"7:30am-10:30am", "11:00am-3pm", "5pm-8:30pm"},
+        "Saturday" : {"8am-10:30am", "11:00am-2:30pm", "5pm-8:30pm"},
+        "Sunday" : {"8:00am-2:30pm", "5pm-8:30pm"},
     },
     "novack" : {
         "Monday" :  "7:30am-2:00am",
@@ -30,13 +32,13 @@ var location_info = {
         "Sunday" : "11:00am-2:00am",
     },
     "collis" : {
-        "Monday" :  "7:00am-8:00pm",
-        "Tuesday" : "7:00am-8:00pm",
-        "Wednesday" : "7:00am-8:00pm",
-        "Thursday"  : "7:00am-8:00pm",
-        "Friday" : "7:00am-8:00pm",
-        "Saturday" : "Closed",
-        "Sunday" : "Closed",
+        "Monday" :  {"7:00am-8:00pm", "9:30pm-1:30am"},
+        "Tuesday" : {"7:00am-8:00pm", "9:30pm-1:30am"},
+        "Wednesday" : {"7:00am-8:00pm", "9:30pm-1:30am"},
+        "Thursday"  : {"7:00am-8:00pm", "9:30pm-1:30am"},
+        "Friday" : {"7:00am-8:00pm", "9:30pm-1:30am"},
+        "Saturday" : "9:30pm-1:30am",
+        "Sunday" : "9:30pm-1:30am",
     },
     "hop" : {
         "Monday" :  "11:00am-midnight",
@@ -48,7 +50,7 @@ var location_info = {
         "Sunday" : "10:30am-midnight",
     },
     "late night" : {
-        "Monday" :  "9:30pm-1:30am",
+        "Monday" :  "9:30pm-1:30am"},
         "Tuesday" : "9:30pm-1:30am",
         "Wednesday" : "9:30pm-1:30am",
         "Thursday"  : "9:30pm-1:30am",
@@ -122,13 +124,35 @@ function getHoursForLocation(intent, session, callback){
     const sessionAttributes = {};
     let shouldEndSession = false;
     let speechOutput = 'Sorry you failed.';
-    if(intent.slots.location.value === "foco"){
+
+    const place = intent.slots.location.value;
+
+    if(place === "foco"){
       speechOutput = "The hours for foco are 4-6pm."
     }
-    if(location_info[intent.slots.location.value] === null){
-        speechOutput = "I'm sorry, I did not recognize that location."
+
+    var d = new Date();
+    var numDay = d.getDay();
+    var day = days[numDay];
+
+    if(location_info[place] === null){
+        speechOutput = "I'm sorry, I did not recognize that location. Which location would you like the hours for?"
     }
-    speechOutput = intent.slots.location.value + " is open from " + location_info[intent.slots.location.value]["Monday"] + " today.";
+
+    if (place === "foco" || place === "collis") {
+      speechOutput = place + " is open from "location_info[place][day][1];
+
+      if (location_info[place][day].length === 2)
+        speechOutput += " and from " + location_info[place][day][2];
+      if (location_info[place][day].length === 2) {
+        speechOutput += location_info[place][day][2];
+        speechOutput += " and " + location_info[place][day][2];
+      }
+
+      speechOutput += " today."
+    } else {
+      speechOutput = intent.slots.location.value + " is open from " + location_info[intent.slots.location.value]["Monday"] + " today.";
+    }
     callback(sessionAttributes,
          buildSpeechletResponse(intent.name, speechOutput, repromptText, shouldEndSession));
 }
