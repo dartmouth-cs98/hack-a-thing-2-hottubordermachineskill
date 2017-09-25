@@ -8,6 +8,37 @@
  * For additional samples, visit the Alexa Skills Kit Getting Started guide at
  * http://amzn.to/1LGWsLG
  */
+// --------------- Dictionary for information-----------------------
+
+var location_info = {
+    "foco" : {
+        "Monday" :  "7:30am-10:30am",
+        "Tuesday" : "7:30am-10:30am",
+        "Wednesday" : "7:30am-10:30am",
+        "Thursday"  : "7:30am-10:30am",
+        "Friday" : "7:30am-10:30am",
+        "Saturday" : "8am-10:30am",
+        "Sunday" : "8:00am-2:30pm",
+    },
+    "novack" : {
+        "Monday" :  "7:30am-2:00am",
+        "Tuesday" : "7:30am-2:00am",
+        "Wednesday" : "7:30am-2:00am",
+        "Thursday"  : "7:30am-2:00am",
+        "Friday" : "7:30am-2:00am",
+        "Saturday" : "1:00pm-2:00am",
+        "Sunday" : "11:00am-2:00am",
+    },
+    "collis" : {
+        "Monday" :  "7:00am-8:00pm",
+        "Tuesday" : "7:00am-8:00pm",
+        "Wednesday" : "7:00am-8:00pm",
+        "Thursday"  : "7:00am-8:00pm",
+        "Friday" : "7:00am-8:00pm",
+        "Saturday" : "Closed",
+        "Sunday" : "Closed",
+    },
+}
 
 
 // --------------- Helpers that build all of the responses -----------------------
@@ -68,65 +99,6 @@ function handleSessionEndRequest(callback) {
     callback({}, buildSpeechletResponse(cardTitle, speechOutput, null, shouldEndSession));
 }
 
-function createFavoriteColorAttributes(favoriteColor) {
-    return {
-        favoriteColor,
-    };
-}
-
-/**
- * Sets the color in the session and prepares the speech to reply to the user.
- */
-function setColorInSession(intent, session, callback) {
-    const cardTitle = intent.name;
-    const favoriteColorSlot = intent.slots.Color;
-    let repromptText = '';
-    let sessionAttributes = {};
-    const shouldEndSession = false;
-    let speechOutput = '';
-
-    if (favoriteColorSlot) {
-        const favoriteColor = favoriteColorSlot.value;
-        sessionAttributes = createFavoriteColorAttributes(favoriteColor);
-        speechOutput = `I now know your favorite color is ${favoriteColor}. You can ask me ` +
-            "your favorite color by saying, what's my favorite color?";
-        repromptText = "You can ask me your favorite color by saying, what's my favorite color?";
-    } else {
-        speechOutput = "I'm not sure what your favorite color is. Please try again.";
-        repromptText = "I'm not sure what your favorite color is. You can tell me your " +
-            'favorite color by saying, my favorite color is red';
-    }
-
-    callback(sessionAttributes,
-         buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
-}
-
-function getColorFromSession(intent, session, callback) {
-    let favoriteColor;
-    const repromptText = null;
-    const sessionAttributes = {};
-    let shouldEndSession = false;
-    let speechOutput = '';
-
-    if (session.attributes) {
-        favoriteColor = session.attributes.favoriteColor;
-    }
-
-    if (favoriteColor) {
-        speechOutput = `Your favorite color is ${favoriteColor}. Goodbye.`;
-        shouldEndSession = true;
-    } else {
-        speechOutput = "I'm not sure what your favorite color is, you can say, my favorite color " +
-            ' is red';
-    }
-
-    // Setting repromptText to null signifies that we do not want to reprompt the user.
-    // If the user does not respond or says something that is not understood, the session
-    // will end.
-    callback(sessionAttributes,
-         buildSpeechletResponse(intent.name, speechOutput, repromptText, shouldEndSession));
-}
-
 function getHoursForLocation(intent, session, callback){
     const repromptText = null;
     const sessionAttributes = {};
@@ -135,6 +107,7 @@ function getHoursForLocation(intent, session, callback){
     if(intent.slots.location.value === "foco"){
       speechOutput = "The hours for foco are 4-6pm."
     }
+    speechOutput = intent.slots.location.value + " is open from " + location_info[intent.slots.location.value]["Monday"] + " today.";
     callback(sessionAttributes,
          buildSpeechletResponse(intent.name, speechOutput, repromptText, shouldEndSession));
 }
@@ -167,11 +140,7 @@ function onIntent(intentRequest, session, callback) {
     const intentName = intentRequest.intent.name;
 
     // Dispatch to your skill's intent handlers
-    if (intentName === 'MyColorIsIntent') {
-        setColorInSession(intent, session, callback);
-    } else if (intentName === 'WhatsMyColorIntent') {
-        getColorFromSession(intent, session, callback);
-    } else if (intentName === 'AMAZON.HelpIntent') {
+    if (intentName === 'AMAZON.HelpIntent') {
         getWelcomeResponse(callback);
     } else if (intentName === 'AMAZON.StopIntent' || intentName === 'AMAZON.CancelIntent') {
         handleSessionEndRequest(callback);
