@@ -1,3 +1,4 @@
 # Benji Hannam and Brian Keare
 
-## Hack-a-thin-2 Alexa skill
+## Hack-a-thing-2 Alexa skill
+
