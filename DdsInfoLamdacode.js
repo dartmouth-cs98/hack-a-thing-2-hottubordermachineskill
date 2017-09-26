@@ -140,7 +140,7 @@ function getHoursForLocation(intent, session, callback){
         speechOutput += ", and from " + location_info[place][day][2];
       }
     } else if (place === "the hop" || place === "novack"){
-      speechOutput = intent.slots.location.value + " is open today from " + location_info[intent.slots.location.value]["Monday"] + " today.";
+      speechOutput = intent.slots.location.value + " is open today from " + location_info[place][day];
     }
     else{
         speechOutput = "I am sorry, I did not understand please ask for either collis, foco, novack or the hop."
